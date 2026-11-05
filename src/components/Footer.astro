@@ -1,0 +1,57 @@
+---
+import { t, loc, type Locale } from '../i18n';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const d = t(lang);
+const year = new Date().getFullYear();
+const rssHref = loc('/rss.xml', lang);
+---
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="footer-meta">
+      <span>© {year} {d.siteName}. {d.footer.rights}</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>{d.footer.builtWith}</span>
+    </div>
+    <nav class="footer-nav" aria-label="Footer">
+      <a href={loc('/', lang)}>{d.nav.home}</a>
+      <a href={loc('/blog', lang)}>{d.nav.blog}</a>
+      <a href="https://github.com/MajedAlbawwab" target="_blank" rel="noopener noreferrer">{d.nav.github} ↗</a>
+      <a href={rssHref}>RSS</a>
+    </nav>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-block-start: 1px solid var(--stroke);
+    margin-block-start: var(--space-2xl);
+  }
+  .footer-inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    align-items: center;
+    justify-content: space-between;
+    padding-block: var(--space-lg);
+  }
+  .footer-meta {
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+  .sep { margin-inline: 4px; }
+  .footer-nav {
+    display: flex;
+    gap: var(--space-md);
+    font-size: 12px;
+    font-family: var(--font-mono);
+    letter-spacing: 0.04em;
+  }
+  .footer-nav a { color: var(--text-secondary); }
+  .footer-nav a:hover { color: var(--text); }
+</style>

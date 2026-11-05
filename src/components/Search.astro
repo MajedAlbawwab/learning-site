@@ -1,0 +1,86 @@
+---
+
+interface Props {
+  placeholder: string;
+  label: string;
+  basePath: string;
+}
+
+const { placeholder, label, basePath } = Astro.props;
+---
+
+<div class="search-box">
+  <label class="sr-only" for="pagefind-search">{label}</label>
+  <input
+    id="pagefind-search"
+    type="search"
+    autocomplete="off"
+    placeholder={placeholder}
+    data-pagefind-search
+    data-pagefind-language={basePath === '/ar' ? 'ar' : 'en'}
+  />
+  <div id="pagefind-results" aria-live="polite"></div>
+</div>
+
+<script define:vars={{ basePath }}>
+  const input = document.getElementById('pagefind-search');
+  const results = document.getElementById('pagefind-results');
+  let debounce;
+  input?.addEventListener('input', () => {
+    clearTimeout(debounce);
+    debounce = setTimeout(async () => {
+      const q = input.value.trim();
+      if (!q) { results.innerHTML = ''; return; }
+      try {
+        const pagefind = await import('/pagefind/pagefind.js');
+        await pagefind.init?.();
+        const response = await pagefind.search(q);
+        results.innerHTML = response.results.slice(0, 8).map((r) => {
+          const title = r.data?.title || r.data?.meta?.title || 'Untitled';
+          const excerpt = (r.data?.excerpt || '').replace(/<[^>]+>/g, '').slice(0, 160);
+          return `<a class="result" href="${r.url}"><strong>${title}</strong><span>${excerpt}</span></a>`;
+        }).join('');
+      } catch (e) {
+        results.innerHTML = '';
+      }
+    }, 200);
+  });
+</script>
+
+<style>
+  .search-box { max-inline-size: 560px; }
+  input {
+    inline-size: 100%;
+    background: var(--canvas-1);
+    border: 1px solid var(--stroke);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    color: var(--text);
+    font-size: 15px;
+    font-family: var(--font-sans);
+  }
+  input::placeholder { color: var(--text-dim); }
+  input:focus { outline: none; border-color: var(--accent); }
+  :global(.result) {
+    display: block;
+    padding: var(--space-sm) 0;
+    border-block-end: 1px solid var(--stroke);
+    color: var(--text);
+    text-decoration: none;
+  }
+  :global(.result:hover) { color: var(--accent); }
+  :global(.result span) {
+    display: block;
+    color: var(--text-secondary);
+    font-size: 13px;
+    margin-block-start: 2px;
+  }
+  .sr-only {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+</style>

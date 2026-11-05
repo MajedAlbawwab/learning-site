@@ -1,0 +1,9 @@
+---
+import BlogIndex from '../../../components/BlogIndex.astro';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('blog');
+---
+
+<BlogIndex lang="ar" posts={posts} basePath="/ar" />
+

@@ -1,0 +1,8 @@
+---
+import HomePage from '../components/HomePage.astro';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('blog');
+---
+
+<HomePage lang="en" posts={posts} basePath="" />

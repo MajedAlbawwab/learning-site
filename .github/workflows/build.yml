@@ -1,0 +1,33 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  repository_dispatch:
+    types: [notes-updated]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: MajedAlbawwab/learning_journy
+          token: ${{ secrets.NOTES_REPO_TOKEN }}
+          path: .notes
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: node scripts/sync-notes.mjs .notes src/content/blog
+      - run: pnpm build
+      - uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: majed-albawwab
+          directory: dist

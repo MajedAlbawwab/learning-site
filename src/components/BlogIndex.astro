@@ -1,0 +1,108 @@
+---
+import Base from '../layouts/Base.astro';
+import PostCard from '../components/PostCard.astro';
+import Search from '../components/Search.astro';
+import { getPublished } from '../lib/posts';
+import { t } from '../i18n';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  lang: 'en' | 'ar';
+  posts: CollectionEntry<'blog'>[];
+  basePath: string;
+}
+
+const { lang, posts, basePath } = Astro.props;
+const d = t(lang);
+const all = getPublished(posts, lang);
+const tags = [...new Set(all.flatMap((p) => p.data.tags))];
+---
+
+<Base
+  lang={lang}
+  title={`${d.blog.heading} — ${d.siteName}`}
+  description={d.blog.heading}
+  current="/blog"
+  canonical={`https://majed-albawwab.pages.dev${basePath}/blog`}
+>
+  <div class="container blog-page">
+    <div class="blog-head">
+      <h1>{d.blog.heading}</h1>
+      <Search placeholder={d.search.placeholder} label={d.search.label} basePath={basePath} />
+    </div>
+
+    {tags.length > 0 && (
+      <div class="tag-filter" role="group" aria-label={d.post.tags}>
+        <button class="chip active" data-tag="all">all</button>
+        {tags.map((tag) => (
+          <button class="chip" data-tag={tag}>{tag}</button>
+        ))}
+      </div>
+    )}
+
+    <div class="cards" id="posts-grid">
+      {all.map((post) => (
+        <div class="post-item" data-tags={post.data.tags.join(' ')}>
+          <PostCard entry={post} lang={lang} readMoreLabel={d.blog.readMore} minReadLabel={d.blog.minRead} basePath={basePath} />
+        </div>
+      ))}
+    </div>
+  </div>
+</Base>
+
+<script>
+  const chips = document.querySelectorAll('.chip[data-tag]');
+  const items = document.querySelectorAll<HTMLElement>('.post-item');
+  chips.forEach((chip) => {
+    chip.addEventListener('click', () => {
+      chips.forEach((c) => c.classList.remove('active'));
+      chip.classList.add('active');
+      const tag = chip.getAttribute('data-tag');
+      items.forEach((item) => {
+        if (tag === 'all' || item.getAttribute('data-tags')?.split(' ').includes(tag ?? '')) {
+          item.style.display = '';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    });
+  });
+</script>
+
+<style>
+  .blog-page { padding-block: var(--space-xl); }
+  .blog-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    margin-block-end: var(--space-lg);
+  }
+  .tag-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-block-end: var(--space-lg);
+  }
+  .chip {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    background: var(--canvas-1);
+    border: 1px solid var(--stroke);
+    border-radius: var(--radius);
+    padding: 4px 10px;
+    color: var(--text-secondary);
+    cursor: pointer;
+  }
+  .chip:hover { border-color: var(--stroke-hover); color: var(--text); }
+  .chip.active { color: var(--accent); border-color: var(--accent); }
+  .cards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--gutter-mobile);
+  }
+  @media (min-width: 768px) { .cards { grid-template-columns: repeat(2, 1fr); gap: 1.25rem; } }
+  @media (min-width: 1024px) { .cards { grid-template-columns: repeat(3, 1fr); gap: var(--gutter); } }
+</style>

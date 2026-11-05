@@ -1,0 +1,94 @@
+---
+import { t, loc, type Locale } from '../i18n';
+
+interface Props {
+  lang: Locale;
+  current?: string;
+  altHref?: string;
+}
+
+const { lang, current = '/', altHref } = Astro.props;
+const d = t(lang);
+const otherLang: Locale = lang === 'ar' ? 'en' : 'ar';
+const altLabel = otherLang === 'ar' ? 'العربية' : 'English';
+const homeHref = loc('/', lang);
+const blogHref = loc('/blog', lang);
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href={homeHref} aria-label={d.siteName}>
+      <span class="brand-dot" aria-hidden="true"></span>
+      <span class="brand-name">{d.siteName}</span>
+    </a>
+
+    <nav class="site-nav" aria-label="Primary">
+      <a href={homeHref} aria-current={current === homeHref ? 'page' : undefined}>{d.nav.home}</a>
+      <a href={blogHref} aria-current={current === blogHref ? 'page' : undefined}>{d.nav.blog}</a>
+      <a href={`${homeHref}#about`}>{d.nav.about}</a>
+      <a href={`${homeHref}#contact`}>{d.nav.contact}</a>
+      <a class="nav-gh" href="https://github.com/MajedAlbawwab" target="_blank" rel="noopener noreferrer">
+        {d.nav.github} <span aria-hidden="true">↗</span>
+      </a>
+      <a class="lang-switch" href={altHref ?? loc('/', otherLang)} lang={otherLang} hreflang={otherLang}>
+        {altLabel}
+      </a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--canvas) 92%, transparent);
+    backdrop-filter: blur(8px);
+    border-block-end: 1px solid var(--stroke);
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    padding-block: var(--space-md);
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    color: var(--text);
+    font-family: var(--font-serif);
+    font-size: 20px;
+  }
+  .brand:hover { text-decoration: none; }
+  .brand-dot {
+    inline-size: 10px;
+    block-size: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .site-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    font-size: 13px;
+    font-family: var(--font-mono);
+    letter-spacing: 0.04em;
+  }
+  .site-nav a { color: var(--text-secondary); }
+  .site-nav a:hover { color: var(--text); text-decoration: none; }
+  .site-nav a[aria-current='page'] { color: var(--accent); }
+  .nav-gh { color: var(--text-secondary) !important; }
+  .lang-switch {
+    border: 1px solid var(--stroke);
+    border-radius: var(--radius);
+    padding: 2px 10px;
+    color: var(--text-secondary) !important;
+  }
+  .lang-switch:hover { border-color: var(--stroke-hover); color: var(--text) !important; }
+  @media (max-width: 767px) {
+    .site-nav { gap: var(--space-sm); flex-wrap: wrap; justify-content: flex-end; }
+    .nav-gh { display: none; }
+  }
+</style>

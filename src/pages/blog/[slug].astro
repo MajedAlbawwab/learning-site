@@ -1,0 +1,16 @@
+---
+import PostPage from '../../components/PostPage.astro';
+import { getCollection } from 'astro:content';
+import { slugOf } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts
+    .filter((p) => p.data.publish && !p.data.draft && p.data.lang === 'en')
+    .map((post) => ({ params: { slug: slugOf(post) } }));
+}
+
+const { slug } = Astro.params;
+---
+
+<PostPage lang="en" slug={slug as string} basePath="" />

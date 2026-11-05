@@ -1,0 +1,66 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/tokens.css';
+import '../styles/global.css';
+import { localeDir, t, loc, type Locale } from '../i18n';
+
+interface Props {
+  lang?: Locale;
+  title?: string;
+  description?: string;
+  current?: string;
+  altHref?: string;
+  canonical?: string;
+  hreflangEn?: string;
+  hreflangAr?: string;
+}
+
+const {
+  lang = 'en',
+  title,
+  description,
+  current = '/',
+  altHref,
+  canonical,
+  hreflangEn = 'https://majed-albawwab.pages.dev/',
+  hreflangAr = 'https://majed-albawwab.pages.dev/ar/'
+} = Astro.props;
+
+const d = t(lang);
+const pageTitle = title ?? d.siteName;
+const pageDesc = description ?? d.tagline;
+const siteUrl = 'https://majed-albawwab.pages.dev';
+const canonicalUrl = canonical ?? `${siteUrl}${loc(current, lang)}`;
+---
+
+<!doctype html>
+<html lang={lang} dir={localeDir(lang)}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDesc} />
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="alternate" hreflang="en" href={hreflangEn} />
+    <link rel="alternate" hreflang="ar" href={hreflangAr} />
+    <link rel="alternate" hreflang="x-default" href={hreflangEn} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDesc} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={pageDesc} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="alternate" type="application/rss+xml" title={`${d.rss.title}`} href={loc('/rss.xml', lang)} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{d.nav.home}</a>
+    <Header lang={lang} current={current} altHref={altHref} />
+    <main id="main" data-pagefind-body>
+      <slot />
+    </main>
+    <Footer lang={lang} />
+  </body>
+</html>

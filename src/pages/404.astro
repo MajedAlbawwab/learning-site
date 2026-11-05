@@ -1,0 +1,56 @@
+---
+import Base from '../layouts/Base.astro';
+import { t } from '../i18n';
+
+const d = t('en');
+const da = t('ar');
+---
+
+<Base lang="en" title={d.notFound.title} description={d.notFound.body} current="/404">
+  <div class="container not-found">
+    <div class="nf-grid">
+      <div class="nf-en">
+        <small>404</small>
+        <h1>{d.notFound.title}</h1>
+        <p>{d.notFound.body}</p>
+        <a class="btn-primary" href="/">{d.notFound.home}</a>
+      </div>
+      <div class="nf-ar" dir="rtl" lang="ar">
+        <small>404</small>
+        <h1>{da.notFound.title}</h1>
+        <p>{da.notFound.body}</p>
+        <a class="btn-primary" href="/ar/">{da.notFound.home}</a>
+      </div>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .not-found { padding-block: var(--space-2xl); }
+  .nf-grid { display: grid; grid-template-columns: 1fr; gap: var(--space-xl); }
+  @media (min-width: 768px) { .nf-grid { grid-template-columns: 1fr 1fr; } }
+  .nf-en, .nf-ar {
+    background: var(--canvas-2);
+    border: 1px solid var(--stroke);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+  }
+  .nf-en small, .nf-ar small {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    margin-block-end: var(--space-sm);
+  }
+  .nf-en p, .nf-ar p { color: var(--text-secondary); margin-block: var(--space-sm) var(--space-lg); }
+  .btn-primary {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--canvas);
+    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: var(--radius);
+  }
+  .btn-primary:hover { background: var(--accent-hover); text-decoration: none; }
+</style>

@@ -1,0 +1,32 @@
+{
+  "name": "majed-albawwab",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@12.5.1",
+  "engines": {
+    "node": ">=22.23.4"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build && pagefind --site dist",
+    "preview": "astro preview",
+    "check": "astro check",
+    "sync-notes": "node scripts/sync-notes.mjs"
+  },
+  "dependencies": {
+    "@astrojs/markdown-remark": "^7.3.5",
+    "@astrojs/rss": "^4.0.19",
+    "@astrojs/sitemap": "^3.7.4",
+    "astro": "^7.4.5",
+    "mdast-util-wiki-link": "^0.1.2",
+    "remark-gfm": "^4.0.1",
+    "remark-wiki-link": "^2.0.1"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "pagefind": "^1.6.0",
+    "typescript": "^5.9.3",
+    "zod": "^4.6.7"
+  }
+}

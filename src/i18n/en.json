@@ -1,0 +1,56 @@
+{
+  "siteName": "Majed Albawwab",
+  "tagline": "Learning in public — notes on software, design, and systems.",
+  "nav": {
+    "home": "Home",
+    "blog": "Blog",
+    "about": "About",
+    "contact": "Contact",
+    "github": "GitHub"
+  },
+  "hero": {
+    "status": "Available for projects",
+    "roles": ["Software engineer", "Writer", "Student of systems"],
+    "ctaWork": "Read the blog",
+    "ctaAbout": "About me"
+  },
+  "about": {
+    "heading": "About",
+    "body": "I build quiet, lasting tools — static sites, notes, and small systems that work without servers. This site is my public learning journal: bilingual, static, and written in Obsidian."
+  },
+  "contact": {
+    "heading": "Contact",
+    "body": "The fastest way to reach me is email. I read everything — thanks for writing.",
+    "email": "hello@example.com",
+    "emailLabel": "Email me"
+  },
+  "blog": {
+    "heading": "Latest writing",
+    "readMore": "Read more",
+    "minRead": "min read",
+    "allPosts": "All posts"
+  },
+  "footer": {
+    "rights": "All rights reserved.",
+    "builtWith": "Built with Astro. Content written in Obsidian."
+  },
+  "search": {
+    "placeholder": "Search posts…",
+    "label": "Search"
+  },
+  "post": {
+    "tags": "Tags",
+    "updated": "Updated",
+    "copy": "Copy code",
+    "copied": "Copied"
+  },
+  "notFound": {
+    "title": "404 — Page not found",
+    "body": "This page doesn't exist or has moved.",
+    "home": "Go home"
+  },
+  "rss": {
+    "title": "Majed Albawwab — Blog",
+    "description": "Notes on software, design, and systems."
+  }
+}

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://majed-albawwab.pages.dev/sitemap-index.xml
