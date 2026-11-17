@@ -13,6 +13,8 @@ const otherLang: Locale = lang === 'ar' ? 'en' : 'ar';
 const altLabel = otherLang === 'ar' ? 'العربية' : 'English';
 const homeHref = loc('/', lang);
 const blogHref = loc('/blog', lang);
+const tagsHref = loc('/tags', lang);
+const onTags = current === '/tags' || current.startsWith('/tags/');
 ---
 
 <header class="site-header">
@@ -24,9 +26,8 @@ const blogHref = loc('/blog', lang);
 
     <nav class="site-nav" aria-label="Primary">
       <a href={homeHref} aria-current={current === homeHref ? 'page' : undefined}>{d.nav.home}</a>
-      <a href={blogHref} aria-current={current === blogHref ? 'page' : undefined}>{d.nav.blog}</a>
-      <a href={`${homeHref}#about`}>{d.nav.about}</a>
-      <a href={`${homeHref}#contact`}>{d.nav.contact}</a>
+      <a href={blogHref} aria-current={current === blogHref ? 'page' : undefined}>{d.nav.writing}</a>
+      <a href={tagsHref} aria-current={onTags ? 'page' : undefined}>{d.nav.tags}</a>
       <a class="nav-gh" href="https://github.com/MajedAlbawwab" target="_blank" rel="noopener noreferrer">
         {d.nav.github} <span aria-hidden="true">↗</span>
       </a>
@@ -72,23 +73,26 @@ const blogHref = loc('/blog', lang);
     display: flex;
     align-items: center;
     gap: var(--space-md);
-    font-size: 13px;
+    font-size: 15px;
+    font-weight: 500;
     font-family: var(--font-mono);
-    letter-spacing: 0.04em;
+    letter-spacing: 0.02em;
   }
-  .site-nav a { color: var(--text-secondary); }
-  .site-nav a:hover { color: var(--text); text-decoration: none; }
+  .site-nav a { color: var(--text); }
+  .site-nav a:hover { color: var(--accent); text-decoration: none; }
   .site-nav a[aria-current='page'] { color: var(--accent); }
-  .nav-gh { color: var(--text-secondary) !important; }
+  .nav-gh { color: var(--text) !important; }
+  .nav-gh:hover { color: var(--accent) !important; }
   .lang-switch {
-    border: 1px solid var(--stroke);
+    border: 1px solid var(--stroke-bright);
     border-radius: var(--radius);
-    padding: 2px 10px;
-    color: var(--text-secondary) !important;
+    padding: 4px 12px;
+    font-weight: 500;
+    color: var(--text) !important;
   }
-  .lang-switch:hover { border-color: var(--stroke-hover); color: var(--text) !important; }
+  .lang-switch:hover { border-color: var(--stroke-hover); color: var(--accent) !important; }
   @media (max-width: 767px) {
-    .site-nav { gap: var(--space-sm); flex-wrap: wrap; justify-content: flex-end; }
+    .site-nav { font-size: 13px; gap: var(--space-sm); flex-wrap: wrap; justify-content: flex-end; }
     .nav-gh { display: none; }
   }
 </style>

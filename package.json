@@ -9,6 +9,8 @@
   },
   "scripts": {
     "dev": "astro dev",
+    "dev:notes": "node scripts/dev-notes.mjs",
+    "notes:update": "node scripts/notes-update.mjs",
     "build": "astro build && pagefind --site dist",
     "preview": "astro preview",
     "check": "astro check",

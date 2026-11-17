@@ -124,7 +124,11 @@ small, .meta {
 .prose ul, .prose ol { margin-block-end: var(--space-lg); padding-inline-start: 1.5em; }
 .prose li { margin-block-end: var(--space-xs); }
 .prose a { overflow-wrap: anywhere; }
-.prose img { border-radius: var(--radius-lg); border: 1px solid var(--stroke); margin-block: var(--space-lg); }
+.prose img { border-radius: 0; border: 1px solid var(--stroke); object-fit: contain; margin-block: var(--space-lg); }
+.prose figure { margin-block: var(--space-lg); }
+.prose figure img { border-radius: 0; border: 1px solid var(--stroke); object-fit: contain; margin-block-end: var(--space-sm); }
+.prose figcaption { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; color: var(--text-dim); }
+.prose .img-missing { border: 1px dashed var(--stroke); background: var(--surface-container); color: var(--text-secondary); font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.04em; padding: var(--space-md); margin-block: var(--space-lg); }
 .prose blockquote {
   border-inline-start: 2px solid var(--accent);
   padding-inline-start: var(--space-md);

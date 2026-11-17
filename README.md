@@ -1,12 +1,14 @@
-# Majed Albawwab — Portfolio & Blog
+# Majed Albawwab — Blog
 
-Bilingual (Arabic RTL + English LTR) static portfolio + blog. Astro, TypeScript, plain CSS. English is the default locale. Designed per `design.md` ("Editorial Obsidian").
+Bilingual (Arabic RTL + English LTR) static blog. Astro, TypeScript, plain CSS. English is the default locale. Designed per `design.md` ("Editorial Obsidian").
 
 ## Run locally
 
 ```sh
 pnpm install
 pnpm dev      # localhost:4321
+pnpm dev:notes  # dev + auto-sync notes every 30s (recommended)
+pnpm notes:update  # one-off: git pull .notes + sync (no dev server)
 pnpm build    # astro build + pagefind
 pnpm preview
 pnpm check    # astro check
@@ -39,6 +41,23 @@ draft: false
 5. A workflow in `MajedAlbawwab/learning_journy` (add `.github/workflows/notify-site.yml` below) dispatches `notes-updated` to this site repo. This repo's `build.yml` then checks out the notes repo, runs `scripts/sync-notes.mjs` (copies only `publish: true` notes + images into `src/content/blog/`), builds, and deploys.
 
 > A note is published **only** with `publish: true`. `draft: true` is local-dev only. Notes without `publish: true` never appear in builds, feeds, search, or the sitemap.
+
+### Local auto-sync (`pnpm dev:notes`)
+
+By default `pnpm dev:notes` pulls the notes repo into `.notes/` (read-only mirror) and syncs publishable notes to `src/content/blog/` before starting `astro dev`. While the dev server runs, it polls every 30 seconds:
+
+- If `.notes/` HEAD changed (git) or any `.md` / image mtime changed (local-vault mode) → runs `pnpm notes:update`, prints a summary (`N published · M skipped · K removed · warnings`), and Astro's hot reload picks up the changed files.
+- If nothing changed → does nothing (no copy, no reload).
+- If `git pull` fails (offline, conflict) → prints a clear warning and keeps serving the last good content; the dev server never crashes.
+
+To preview **unsaved / unpushed** notes instantly, point the watcher at your live Obsidian vault (skips git entirely):
+
+```sh
+# .env.local  (gitignored)
+NOTES_LOCAL_PATH=C:\Users\majed\Documents\Obsidian\VaultName
+```
+
+Copy `.env.example` to `.env.local` and edit the path. When `NOTES_LOCAL_PATH` is set, `pnpm notes:update` and `pnpm dev:notes` read from that folder instead of `.notes/` and never call `git`.
 
 ### Recommended Obsidian settings
 

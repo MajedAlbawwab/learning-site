@@ -6,7 +6,7 @@ import { slugOf } from '../../../lib/posts';
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
   return posts
-    .filter((p) => p.data.publish && !p.data.draft && p.data.lang === 'ar')
+    .filter((p) => p.data.publish && !p.data.draft)
     .map((post) => ({ params: { slug: slugOf(post) } }));
 }
 

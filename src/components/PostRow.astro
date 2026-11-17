@@ -1,0 +1,103 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { formatDate, readingTime, slugOf } from '../lib/posts';
+import type { Locale } from '../i18n';
+
+interface Props {
+  entry: CollectionEntry<'blog'>;
+  lang: Locale;
+  readMoreLabel: string;
+  minReadLabel: string;
+  headingLevel?: 2 | 3;
+}
+
+const { entry, lang, readMoreLabel, minReadLabel, headingLevel = 3 } = Astro.props;
+const slug = slugOf(entry);
+const postLang = entry.data.lang as Locale;
+const postBase = postLang === 'ar' ? '/ar' : '';
+const href = `${postBase}/blog/${slug}`;
+const minutes = readingTime(entry.body ?? '', postLang);
+const isOtherLang = postLang !== lang;
+const Heading = headingLevel === 2 ? 'h2' : 'h3';
+---
+
+<article class="post-row" lang={postLang} dir={postLang === 'ar' ? 'rtl' : 'ltr'}>
+  <div class="post-row-meta">
+    <time datetime={entry.data.date.toISOString()}>{formatDate(entry.data.date, postLang)}</time>
+    <span aria-hidden="true">·</span>
+    <span>{minutes} {minReadLabel}</span>
+    {isOtherLang && <span class="chip lang-chip" lang={postLang}>{postLang.toUpperCase()}</span>}
+  </div>
+  <Heading class="post-row-title">
+    <a href={href}>{entry.data.title}</a>
+  </Heading>
+  <p class="post-row-desc">{entry.data.description}</p>
+  <div class="post-row-foot">
+    <div class="post-row-tags">
+      {entry.data.tags.map((tag) => <span class="chip">{tag}</span>)}
+    </div>
+    <a class="read-more" href={href}>{readMoreLabel} <span aria-hidden="true">→</span></a>
+  </div>
+</article>
+
+<style>
+  .post-row {
+    padding-block: var(--space-lg);
+    border-block-end: 1px solid var(--stroke);
+  }
+  .post-row-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-sm);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+    margin-block-end: var(--space-sm);
+  }
+  .chip {
+    background: var(--canvas-1);
+    border: 1px solid var(--stroke);
+    border-radius: var(--radius);
+    padding: 2px 8px;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+  }
+  .lang-chip {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .post-row-title {
+    font-size: 24px;
+    line-height: 32px;
+    margin-block-end: var(--space-xs);
+  }
+  .post-row-title a { color: var(--text); text-decoration: none; }
+  .post-row-title a:hover { color: var(--accent); text-decoration: none; }
+  .post-row-desc {
+    color: var(--text-secondary);
+    font-size: 15px;
+    line-height: 24px;
+    max-inline-size: 70ch;
+    margin-block-end: var(--space-sm);
+  }
+  .post-row-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+  }
+  .post-row-tags { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
+  .read-more {
+    font-size: 12px;
+    font-family: var(--font-mono);
+    letter-spacing: 0.04em;
+  }
+  @media (max-width: 767px) {
+    .post-row-title { font-size: 21px; line-height: 29px; }
+  }
+</style>

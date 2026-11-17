@@ -12,7 +12,14 @@ const blog = defineCollection({
     lang: z.enum(['ar', 'en']),
     slug: z.string().optional(),
     translationKey: z.string().optional(),
-    tags: z.array(z.string()).default([]),
+    tags: z
+      .array(z.string())
+      .default([])
+      .transform((tags) =>
+        Array.from(
+          new Set(tags.map((t) => t.trim().replace(/^#/, '').trim().toLowerCase()).filter(Boolean))
+        )
+      ),
     cover: z.string().optional(),
     publish: z.boolean(),
     draft: z.boolean().default(false)

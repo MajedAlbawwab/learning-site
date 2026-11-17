@@ -1,0 +1,47 @@
+---
+import Base from '../../layouts/Base.astro';
+import PostRow from '../../components/PostRow.astro';
+import { getPublishedMixed } from '../../lib/posts';
+import { getTagIndex, slugifyTag } from '../../lib/tags';
+import { t } from '../../i18n';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  const mixed = getPublishedMixed(posts, 'en');
+  return getTagIndex(mixed, 'en').map((t) => ({ params: { tag: t.slug } }));
+}
+
+const { tag } = Astro.params;
+const posts = await getCollection('blog');
+const mixed = getPublishedMixed(posts, 'en');
+const index = getTagIndex(mixed, 'en');
+const tagInfo = index.find((t) => t.slug === slugifyTag(tag as string));
+const d = t('en');
+const title = tagInfo ? `[${tagInfo.label}] — ${d.siteName}` : `[${(tag as string) ?? ''}] — ${d.siteName}`;
+const list = tagInfo ? tagInfo.posts : [];
+const enTag = tagInfo ? `/tags/${tagInfo.slug}/` : `/tags/`;
+const arTag = tagInfo ? `/ar/tags/${tagInfo.slug}/` : `/ar/tags/`;
+---
+
+<Base lang="en" title={title} description={title} current="/tags" canonical={`https://majed-albawwab.pages.dev/tags/${(tag as string) ?? ''}/`} hreflangEn={`https://majed-albawwab.pages.dev${enTag}`} hreflangAr={`https://majed-albawwab.pages.dev${arTag}`}>
+  <div class="container tags-page">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="/">{d.nav.home}</a><span aria-hidden="true">/</span><a href="/blog">{d.nav.writing}</a>
+    </nav>
+    <h1>{tagInfo ? `[${tagInfo.label}]` : `[${(tag as string) ?? ''}]`}</h1>
+    <p class="tag-count">{d.blog.filterCount.replace('{count}', String(list.length))}</p>
+    <div class="post-list">
+      {list.map((post) => (
+        <PostRow entry={post} lang="en" headingLevel={2} readMoreLabel={d.blog.readMore} minReadLabel={d.blog.minRead} />
+      ))}
+    </div>
+  </div>
+</Base>
+
+<style>
+  .tags-page { padding-block: var(--space-xl); }
+  .breadcrumb { display: flex; gap: var(--space-sm); font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.04em; color: var(--text-dim); margin-block-end: var(--space-lg); }
+  .tag-count { color: var(--text-secondary); margin-block-end: var(--space-lg); font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.04em; }
+  .post-list { display: flex; flex-direction: column; border-block-start: 1px solid var(--stroke); }
+</style>

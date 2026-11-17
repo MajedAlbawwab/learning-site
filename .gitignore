@@ -15,7 +15,13 @@ pnpm-debug.log*
 
 # environment variables
 .env
+.env.local
 .env.production
+
+# local-vault sync state for pnpm notes:update / pnpm dev:notes
+.sync-state.json
+src/content/blog/.published-slugs.json
+public/notes-images/.sync-images.json
 
 # macOS-specific files
 .DS_Store

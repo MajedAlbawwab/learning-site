@@ -3,20 +3,13 @@
   "tagline": "Learning in public — notes on software, design, and systems.",
   "nav": {
     "home": "Home",
-    "blog": "Blog",
-    "about": "About",
-    "contact": "Contact",
+    "writing": "Writing",
+    "tags": "Tags",
     "github": "GitHub"
   },
   "hero": {
-    "status": "Available for projects",
-    "roles": ["Software engineer", "Writer", "Student of systems"],
-    "ctaWork": "Read the blog",
-    "ctaAbout": "About me"
-  },
-  "about": {
-    "heading": "About",
-    "body": "I build quiet, lasting tools — static sites, notes, and small systems that work without servers. This site is my public learning journal: bilingual, static, and written in Obsidian."
+    "intro1": "I built this quiet corner to think slowly, away from the noise of platforms, and to document what I learn about technology every day. Think of it as a lighthouse for anyone passing by.",
+    "intro2": "Welcome to my personal blog; a peaceful space designed to read, reflect, and understand technology with clarity and depth."
   },
   "contact": {
     "heading": "Contact",
@@ -26,9 +19,14 @@
   },
   "blog": {
     "heading": "Latest writing",
+    "archiveHeading": "Writing",
     "readMore": "Read more",
     "minRead": "min read",
-    "allPosts": "All posts"
+    "allPosts": "All posts",
+    "tagsHeading": "Tags",
+    "filterClear": "clear",
+    "filterCount": "{count} posts",
+    "noPosts": "No posts match."
   },
   "footer": {
     "rights": "All rights reserved.",

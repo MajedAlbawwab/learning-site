@@ -1,0 +1,35 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getPublishedMixed } from '../../lib/posts';
+import { getTagIndex } from '../../lib/tags';
+import { t } from '../../i18n';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('blog');
+const mixed = getPublishedMixed(posts, 'en');
+const index = getTagIndex(mixed, 'en');
+const d = t('en');
+---
+
+<Base lang="en" title={`${d.post.tags} — ${d.siteName}`} description={d.post.tags} current="/tags" canonical="https://majed-albawwab.pages.dev/tags/" hreflangEn="https://majed-albawwab.pages.dev/tags/" hreflangAr="https://majed-albawwab.pages.dev/ar/tags/">
+  <div class="container tags-page">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="/">{d.nav.home}</a><span aria-hidden="true">/</span><a href="/blog">{d.nav.writing}</a>
+    </nav>
+    <h1>{d.post.tags}</h1>
+    <ul class="tag-list">
+      {index.map((t) => (
+        <li><a class="tag-row" href={`/tags/${t.slug}/`}><span class="tag-row-label">[{t.label}]</span><span class="tag-row-count">({t.count})</span></a></li>
+      ))}
+    </ul>
+  </div>
+</Base>
+
+<style>
+  .tags-page { padding-block: var(--space-xl); }
+  .breadcrumb { display: flex; gap: var(--space-sm); font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.04em; color: var(--text-dim); margin-block-end: var(--space-lg); }
+  .tag-list { list-style: none; display: flex; flex-direction: column; gap: 0; }
+  .tag-row { display: flex; justify-content: space-between; gap: var(--space-md); padding-block: var(--space-sm); border-block-end: 1px solid var(--stroke); font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.04em; color: var(--text); text-decoration: none; }
+  .tag-row:hover { color: var(--accent); }
+  .tag-row-count { color: var(--text-dim); }
+</style>

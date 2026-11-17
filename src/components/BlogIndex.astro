@@ -1,8 +1,9 @@
 ---
 import Base from '../layouts/Base.astro';
-import PostCard from '../components/PostCard.astro';
+import PostRow from '../components/PostRow.astro';
 import Search from '../components/Search.astro';
-import { getPublished } from '../lib/posts';
+import { getPublishedMixed } from '../lib/posts';
+import { getTagIndex, slugifyTag } from '../lib/tags';
 import { t } from '../i18n';
 import type { CollectionEntry } from 'astro:content';
 
@@ -10,63 +11,155 @@ interface Props {
   lang: 'en' | 'ar';
   posts: CollectionEntry<'blog'>[];
   basePath: string;
+  initialTag?: string;
 }
 
-const { lang, posts, basePath } = Astro.props;
+const { lang, posts, basePath, initialTag } = Astro.props;
 const d = t(lang);
-const all = getPublished(posts, lang);
-const tags = [...new Set(all.flatMap((p) => p.data.tags))];
+const all = getPublishedMixed(posts, lang);
+const tagIndex = getTagIndex(all, lang);
+const tagsBase = `${basePath}/tags`;
+const initialTags = initialTag ? [slugifyTag(initialTag)] : [];
 ---
 
 <Base
   lang={lang}
-  title={`${d.blog.heading} — ${d.siteName}`}
-  description={d.blog.heading}
+  title={`${d.blog.archiveHeading} — ${d.siteName}`}
+  description={d.blog.archiveHeading}
   current="/blog"
   canonical={`https://majed-albawwab.pages.dev${basePath}/blog`}
 >
   <div class="container blog-page">
     <div class="blog-head">
-      <h1>{d.blog.heading}</h1>
+      <h1>{d.blog.archiveHeading}</h1>
       <Search placeholder={d.search.placeholder} label={d.search.label} basePath={basePath} />
     </div>
 
-    {tags.length > 0 && (
+    {tagIndex.length > 0 && (
       <div class="tag-filter" role="group" aria-label={d.post.tags}>
-        <button class="chip active" data-tag="all">all</button>
-        {tags.map((tag) => (
-          <button class="chip" data-tag={tag}>{tag}</button>
+        <a class="tag-chip tag-chip--all" href={`${basePath}/blog`} data-tag="__all" aria-pressed="false">
+          <span class="tag-chip-text">[all]</span>
+        </a>
+        {tagIndex.map((t) => (
+          <a
+            class="tag-chip"
+            href={`${tagsBase}/${t.slug}/`}
+            data-tag={t.slug}
+            data-tag-label={t.label}
+            aria-pressed="false"
+          >
+            <span class="tag-chip-text">[{t.label}]</span>
+            <span class="tag-chip-count">({t.count})</span>
+          </a>
         ))}
       </div>
     )}
 
-    <div class="cards" id="posts-grid">
-      {all.map((post) => (
-        <div class="post-item" data-tags={post.data.tags.join(' ')}>
-          <PostCard entry={post} lang={lang} readMoreLabel={d.blog.readMore} minReadLabel={d.blog.minRead} basePath={basePath} />
-        </div>
-      ))}
+    <div class="filter-line">
+      <code id="filter-command" aria-live="polite">$ ls</code>
+      <button type="button" class="filter-clear" data-clear hidden>{d.blog.filterClear}</button>
+      <span class="filter-count" id="filter-count" aria-live="polite"></span>
     </div>
+
+    <div class="post-list" id="posts-grid">
+      {all.map((post) => {
+        const slugs = [...new Set(post.data.tags.map((t) => slugifyTag(t)))].filter(Boolean);
+        return (
+          <div class="post-item" data-tags={slugs.join(' ')}>
+            <PostRow
+              entry={post}
+              lang={lang}
+              headingLevel={2}
+              readMoreLabel={d.blog.readMore}
+              minReadLabel={d.blog.minRead}
+            />
+          </div>
+        );
+      })}
+    </div>
+    <p class="no-posts" id="no-posts" hidden>{d.blog.noPosts}</p>
   </div>
 </Base>
 
-<script>
-  const chips = document.querySelectorAll('.chip[data-tag]');
-  const items = document.querySelectorAll<HTMLElement>('.post-item');
-  chips.forEach((chip) => {
-    chip.addEventListener('click', () => {
-      chips.forEach((c) => c.classList.remove('active'));
-      chip.classList.add('active');
+<script define:vars={{ initialTags, filterCountTemplate: d.blog.filterCount }}>
+  const chips = Array.from(document.querySelectorAll('.tag-chip[data-tag]'));
+  const items = Array.from(document.querySelectorAll('.post-item'));
+  const command = document.getElementById('filter-command');
+  const countEl = document.getElementById('filter-count');
+  const clearBtn = document.querySelector('[data-clear]');
+  const noPosts = document.getElementById('no-posts');
+  const selected = new Set(initialTags);
+  if (selected.size) {
+    const params = new URLSearchParams(location.search);
+    const fromQuery = params.getAll('tag').map((s) => s.trim()).filter(Boolean);
+    if (fromQuery.length) {
+      selected.clear();
+      fromQuery.forEach((s) => selected.add(s));
+    }
+  } else {
+    const params = new URLSearchParams(location.search);
+    params.getAll('tag').forEach((s) => {
+      const slug = s.trim();
+      if (slug) selected.add(slug);
+    });
+  }
+
+  function matches(item) {
+    if (selected.size === 0) return true;
+    const tags = (item.getAttribute('data-tags') || '').split(/\s+/).filter(Boolean);
+    return tags.length > 0 && [...selected].every((s) => tags.includes(s));
+  }
+
+  function updateUrl() {
+    const params = new URLSearchParams(location.search);
+    params.delete('tag');
+    [...selected].forEach((s) => params.append('tag', s));
+    history.replaceState(null, '', `${location.pathname}${params.toString() ? '?' + params.toString() : ''}${location.hash}`);
+  }
+
+  function apply() {
+    let visible = 0;
+    items.forEach((item) => {
+      const show = matches(item);
+      item.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    chips.forEach((chip) => {
       const tag = chip.getAttribute('data-tag');
-      items.forEach((item) => {
-        if (tag === 'all' || item.getAttribute('data-tags')?.split(' ').includes(tag ?? '')) {
-          item.style.display = '';
-        } else {
-          item.style.display = 'none';
-        }
-      });
+      const on = tag === '__all' ? selected.size === 0 : selected.has(tag ?? '');
+      chip.classList.toggle('active', on);
+      chip.setAttribute('aria-pressed', String(on));
+    });
+    if (selected.size === 0) {
+      command.textContent = '$ ls';
+    } else {
+      command.textContent = '$ ls ' + [...selected].map((s) => `--tag=${s}`).join(' ');
+    }
+    countEl.textContent = visible === 0 ? '' : filterCountTemplate.replace('{count}', String(visible));
+    clearBtn.hidden = selected.size === 0;
+    noPosts.hidden = visible !== 0;
+  }
+
+  chips.forEach((chip) => {
+    chip.addEventListener('click', (e) => {
+      e.preventDefault();
+      const tag = chip.getAttribute('data-tag');
+      if (tag === '__all') {
+        selected.clear();
+      } else if (tag) {
+        if (selected.has(tag)) selected.delete(tag);
+        else selected.add(tag);
+      }
+      updateUrl();
+      apply();
     });
   });
+  clearBtn?.addEventListener('click', () => {
+    selected.clear();
+    updateUrl();
+    apply();
+  });
+  apply();
 </script>
 
 <style>
@@ -83,9 +176,12 @@ const tags = [...new Set(all.flatMap((p) => p.data.tags))];
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-sm);
-    margin-block-end: var(--space-lg);
+    margin-block-end: var(--space-md);
   }
-  .chip {
+  .tag-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
     font-family: var(--font-mono);
     font-size: 11px;
     letter-spacing: 0.06em;
@@ -94,15 +190,47 @@ const tags = [...new Set(all.flatMap((p) => p.data.tags))];
     border-radius: var(--radius);
     padding: 4px 10px;
     color: var(--text-secondary);
+    text-decoration: none;
+  }
+  .tag-chip:hover { border-color: var(--stroke-hover); color: var(--text); text-decoration: none; }
+  .tag-chip.active { color: var(--accent); border-color: var(--accent); }
+  .tag-chip-count { color: var(--text-dim); }
+  .tag-chip.active .tag-chip-count { color: var(--accent); }
+  .filter-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-block-end: var(--space-lg);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: var(--text-secondary);
+  }
+  .filter-line code {
+    color: var(--text);
+    background: var(--canvas-1);
+    border: 1px solid var(--stroke);
+    border-radius: var(--radius);
+    padding: 4px 10px;
+  }
+  .filter-clear {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    background: transparent;
+    border: 1px solid var(--stroke);
+    border-radius: var(--radius);
+    padding: 4px 10px;
+    color: var(--text-secondary);
     cursor: pointer;
   }
-  .chip:hover { border-color: var(--stroke-hover); color: var(--text); }
-  .chip.active { color: var(--accent); border-color: var(--accent); }
-  .cards {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--gutter-mobile);
+  .filter-clear:hover { color: var(--text); border-color: var(--stroke-hover); }
+  .filter-count { color: var(--text-dim); }
+  .no-posts { color: var(--text-secondary); margin-block-end: var(--space-lg); }
+  .post-list {
+    display: flex;
+    flex-direction: column;
+    border-block-start: 1px solid var(--stroke);
   }
-  @media (min-width: 768px) { .cards { grid-template-columns: repeat(2, 1fr); gap: 1.25rem; } }
-  @media (min-width: 1024px) { .cards { grid-template-columns: repeat(3, 1fr); gap: var(--gutter); } }
 </style>

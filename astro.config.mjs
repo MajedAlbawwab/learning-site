@@ -3,6 +3,7 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import remarkWikiLink from 'remark-wiki-link';
 import remarkGfm from 'remark-gfm';
+import remarkImageEmbed from './scripts/remark-image-embed.mjs';
 
 const site = 'https://majed-albawwab.pages.dev';
 
@@ -37,6 +38,6 @@ export default defineConfig({
   },
   markdown: {
     shikiConfig: { theme: shikiTheme, wrap: true },
-    remarkPlugins: [[remarkWikiLink, { wikiLinkClassName: 'wikilink' }], remarkGfm]
+    remarkPlugins: [[remarkWikiLink, { wikiLinkClassName: 'wikilink' }], remarkGfm, remarkImageEmbed]
   }
 });

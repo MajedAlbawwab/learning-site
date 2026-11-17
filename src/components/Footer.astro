@@ -20,9 +20,11 @@ const rssHref = loc('/rss.xml', lang);
     </div>
     <nav class="footer-nav" aria-label="Footer">
       <a href={loc('/', lang)}>{d.nav.home}</a>
-      <a href={loc('/blog', lang)}>{d.nav.blog}</a>
+      <a href={loc('/blog', lang)}>{d.nav.writing}</a>
+      <a href={loc('/tags', lang)}>{d.nav.tags}</a>
       <a href="https://github.com/MajedAlbawwab" target="_blank" rel="noopener noreferrer">{d.nav.github} ↗</a>
       <a href={rssHref}>RSS</a>
+      <a href={`mailto:${d.contact.email}`}>{d.contact.emailLabel}</a>
     </nav>
   </div>
 </footer>
@@ -47,6 +49,7 @@ const rssHref = loc('/rss.xml', lang);
   .sep { margin-inline: 4px; }
   .footer-nav {
     display: flex;
+    flex-wrap: wrap;
     gap: var(--space-md);
     font-size: 12px;
     font-family: var(--font-mono);
